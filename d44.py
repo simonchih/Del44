@@ -10,7 +10,7 @@ stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
 
 def index_to_texture(index):
     if 0 == index:
-        return stone
+        return None
     elif 1 == index:
         return stone_green
     elif 2 == index:
@@ -19,6 +19,8 @@ def index_to_texture(index):
         return stone_red
     elif 4 == index:
         return stone_blue
+    elif 5 == index:
+        return stone
 
 def main():
     # Set the working directory (where we expect to find files) to the same
@@ -35,7 +37,7 @@ def main():
 
     for i in range(h_num):
         for j in range(w_num):
-            v = random.randint(0, 4)
+            v = random.randint(1, 5)
             stone_matrix[i][j] = v
     
     s = 1.5 #scale
