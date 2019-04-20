@@ -28,26 +28,28 @@ def main():
     file_path = os.path.dirname(os.path.abspath(__file__))
     os.chdir(file_path)
     
-    # Open the window. Set the window title and dimensions (width and height)
-    arcade.open_window(600, 640, "Deletion 44")
+    h_num = 20
+    w_num = 20
     
-    stone_matrix = [[0 for x in range(20)] for y in range(20)]
+    stone_matrix = [[0 for x in range(w_num)] for y in range(h_num)]
 
-    for i in range(20):
-        for j in range(20):
+    for i in range(h_num):
+        for j in range(w_num):
             v = random.randint(0, 4)
             stone_matrix[i][j] = v
     
-    h_num = 20
-    w_num = 20
     s = 1.5 #scale
+    top_block_h = 40
     istone = index_to_texture(stone_matrix[0][0])
     
     cell_width = int(s*istone.width)
     cell_height = int(s*istone.height)
     
-    table_width = 20 * cell_width
-    table_height = 20 * cell_height
+    table_width = w_num * cell_width
+    table_height = h_num * cell_height
+    
+    # Open the window. Set the window title and dimensions (width and height)
+    arcade.open_window(table_width, table_height + top_block_h, "Deletion 44")
     
     # Set the background color to white
     # For a list of named colors see
@@ -71,8 +73,8 @@ def main():
     base_x = 15
     base_y = 15
     
-    for y in range(20):
-        for x in range(20):
+    for y in range(h_num):
+        for x in range(w_num):
             istone = index_to_texture(stone_matrix[y][x])
             arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
        
