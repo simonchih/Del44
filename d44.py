@@ -70,8 +70,8 @@ def main():
     for y in range(0, table_height + 1, cell_height):
         arcade.draw_line(0, y, table_width, y, arcade.color.BLACK, 1)
     
-    base_x = 15
-    base_y = 15
+    base_x = cell_width  // 2
+    base_y = cell_height // 2
     
     for y in range(h_num):
         for x in range(w_num):
