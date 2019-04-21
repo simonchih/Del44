@@ -32,7 +32,7 @@ class awindow(arcade.Window):
         os.chdir(file_path)
         
         self.selected = 0 # (w, h): selected, 0: NOT
-        self.stone_matrix = [[0 for x in range(w_num)] for y in range(h_num)]
+        self.stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
         
         # Set the background color to white
         # For a list of named colors see
@@ -45,7 +45,7 @@ class awindow(arcade.Window):
         for i in range(h_num):
             for j in range(w_num):
                 v = random.randint(1, 5)
-                self.stone_matrix[i][j] = v
+                self.stone_matrix[j][i] = v
     
     # True: click mouse button, False: NOT
     def on_click(self, button):
@@ -78,9 +78,9 @@ class awindow(arcade.Window):
         base_x = cell_width  // 2
         base_y = cell_height // 2
     
-        for y in range(h_num):
-            for x in range(w_num):
-                istone = index_to_texture(stone_matrix[y][x])
+        for x in range(w_num):
+            for y in range(h_num):
+                istone = index_to_texture(stone_matrix[x][y])
                 arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
                   
     # override
@@ -109,33 +109,33 @@ class awindow(arcade.Window):
                 
                 if dest_h == org_h:
                     if dest_w == org_w + 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
+                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
                     elif dest_w == org_w - 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
+                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
 
                 if dest_w == org_w:
                     if dest_h == org_h + 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
+                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
                     elif dest_h == org_h - 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
+                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
                         
@@ -157,7 +157,7 @@ def index_to_texture(index):
 
 # dir: 0, horizontal. 1, vertical
 def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
-    stone_value = stone_matrix[oh][ow]
+    stone_value = stone_matrix[ow][oh]
     
     if 0 == index_to_texture(stone_value):
         return stone_mark
