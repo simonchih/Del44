@@ -103,20 +103,41 @@ class awindow(arcade.Window):
             elif 0 == self.selected:
                 self.selected = (x // 30, y // 30)
             else:
-                (dest_x, dest_y) = (x // 30, y // 30)
-                (org_x, org_y) = self.selected
+                stone_mark = set()
+                (dest_w, dest_h) = (x // 30, y // 30)
+                (org_w, org_h) = self.selected
                 
-                if dest_y == org_y:
-                    if dest_x == org_x + 1:
-                        pass
-                    elif dest_x == org_x - 1:
-                        pass
+                if dest_h == org_h:
+                    if dest_w == org_w + 1:
+                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
+                        if len(stone_mark) >= 3:
+                            for (dw, dh) in stone_mark:
+                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                            #print(stone_mark)
+                            stone_mark = set()
+                    elif dest_w == org_w - 1:
+                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
+                        if len(stone_mark) >= 3:
+                            for (dw, dh) in stone_mark:
+                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                            #print(stone_mark)
+                            stone_mark = set()
 
-                if dest_x == org_x:
-                    if dest_y == org_y + 1:
-                        pass
-                    elif dest_y == org_y - 1:
-                        pass
+                if dest_w == org_w:
+                    if dest_h == org_h + 1:
+                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
+                        if len(stone_mark) >= 3:
+                            for (dw, dh) in stone_mark:
+                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                            #print(stone_mark)
+                            stone_mark = set()
+                    elif dest_h == org_h - 1:
+                        stone_mark = calc_seq(self.stone_matrix[dest_h][dest_w], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
+                        if len(stone_mark) >= 3:
+                            for (dw, dh) in stone_mark:
+                                self.stone_matrix[dh][dw] = self.stone_matrix[org_h][org_w]
+                            #print(stone_mark)
+                            stone_mark = set()
                         
                 self.selected = 0
 
@@ -134,6 +155,24 @@ def index_to_texture(index):
     elif 5 == index:
         return stone
 
+# dir: 0, horizontal. 1, vertical
+def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
+    stone_value = stone_matrix[oh][ow]
+    
+    if 0 == index_to_texture(stone_value):
+        return stone_mark
+    elif (ow, oh) not in stone_mark:
+        if ovalue == stone_value:
+            stone_mark.add((ow, oh))
+            if 0 == dir:
+                return calc_seq(ovalue, ow + 1, oh, stone_matrix, dir, stone_mark) | calc_seq(ovalue, ow - 1, oh, stone_matrix, dir, stone_mark)
+            else:
+                return calc_seq(ovalue, ow, oh + 1, stone_matrix, dir, stone_mark) | calc_seq(ovalue, ow, oh - 1, stone_matrix, dir, stone_mark)
+        else:
+            return stone_mark
+    else:
+        return stone_mark    
+        
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
     window.setup()   
