@@ -8,6 +8,118 @@ stone_yellow = arcade.load_texture("images/stone_yellow_20x20.gif")
 stone_red = arcade.load_texture("images/stone_red_20x20.gif")
 stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
 
+h_num = 20
+w_num = 20
+
+s = 1.5 #scale
+top_block_h = 40
+
+cell_width = int(s*stone.width)
+cell_height = int(s*stone.height)
+table_width = w_num * cell_width
+table_height = h_num * cell_height
+    
+class awindow(arcade.Window):
+    def __init__(self, width: float = 600, height: float = 640, title: str = 'Arcade Window'):
+        # Call the parent class initializer
+        super().__init__(width, height, title)
+        
+        # Set the working directory (where we expect to find files) to the same
+        # directory this .py file is in. You can leave this out of your own
+        # code, but it is needed to easily run the examples using "python -m"
+        # as mentioned at the top of this program.
+        file_path = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(file_path)
+        
+        self.selected = 0 # (w, h): selected, 0: NOT
+        self.stone_matrix = [[0 for x in range(w_num)] for y in range(h_num)]
+        
+        # Set the background color to white
+        # For a list of named colors see
+        # http://arcade.academy/arcade.color.html
+        # Colors can also be specified in (red, green, blue) format and
+        # (red, green, blue, alpha) format.
+        arcade.set_background_color(arcade.color.WHITE)
+    
+    def setup(self):
+        for i in range(h_num):
+            for j in range(w_num):
+                v = random.randint(1, 5)
+                self.stone_matrix[i][j] = v
+    
+    # True: click mouse button, False: NOT
+    def on_click(self, button):
+        if button == arcade.MOUSE_BUTTON_LEFT or button == arcade.MOUSE_BUTTON_RIGHT or button == arcade.MOUSE_BUTTON_MIDDLE:
+            return True
+        else:
+            return False
+    
+    
+    def draw_table(self):
+        # Draw vertical lines every 120 pixels
+        for x in range(0, table_width + 1, cell_width):
+            arcade.draw_line(x, 0, x, table_height, arcade.color.BLACK, 1)
+        
+        # Draw horizontal lines every 200 pixels
+        for y in range(0, table_height + 1, cell_height):
+            arcade.draw_line(0, y, table_width, y, arcade.color.BLACK, 1)
+        
+    def draw_selected(self):
+        if self.selected != 0:
+            (w, h) = self.selected
+            left = w * cell_width
+            right = left + cell_width
+            bottom = h * cell_height
+            top = bottom + cell_height
+            
+            arcade.draw_lrtb_rectangle_outline(left = left, right = right, top = top, bottom = bottom, color = arcade.color.ALABAMA_CRIMSON, border_width = 2)        
+    
+    def draw_stone(self, stone_matrix):
+        base_x = cell_width  // 2
+        base_y = cell_height // 2
+    
+        for y in range(h_num):
+            for x in range(w_num):
+                istone = index_to_texture(stone_matrix[y][x])
+                arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
+                  
+    # override
+    def on_draw(self):    
+        arcade.start_render()
+        self.draw_table()
+        self.draw_stone(self.stone_matrix)
+        self.draw_selected()
+        
+        # Finish the render.
+        # Nothing will be drawn without this.
+        # Must happen after all draw commands
+        #arcade.finish_render()
+        
+    # override
+    def on_mouse_press(self, x, y, button, modifiers):
+        if self.on_click(button):
+            if x >= table_width or y >= table_height:
+                self.selected = 0
+            elif 0 == self.selected:
+                self.selected = (x // 30, y // 30)
+            else:
+                (dest_x, dest_y) = (x // 30, y // 30)
+                (org_x, org_y) = self.selected
+                
+                if dest_y == org_y:
+                    if dest_x == org_x + 1:
+                        pass
+                    elif dest_x == org_x - 1:
+                        pass
+
+                if dest_x == org_x:
+                    if dest_y == org_y + 1:
+                        pass
+                    elif dest_y == org_y - 1:
+                        pass
+                        
+                self.selected = 0
+
 def index_to_texture(index):
     if 0 == index:
         return None
@@ -23,71 +135,8 @@ def index_to_texture(index):
         return stone
 
 def main():
-    # Set the working directory (where we expect to find files) to the same
-    # directory this .py file is in. You can leave this out of your own
-    # code, but it is needed to easily run the examples using "python -m"
-    # as mentioned at the top of this program.
-    file_path = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(file_path)
-    
-    h_num = 20
-    w_num = 20
-    
-    stone_matrix = [[0 for x in range(w_num)] for y in range(h_num)]
-
-    for i in range(h_num):
-        for j in range(w_num):
-            v = random.randint(1, 5)
-            stone_matrix[i][j] = v
-    
-    s = 1.5 #scale
-    top_block_h = 40
-    istone = index_to_texture(stone_matrix[0][0])
-    
-    cell_width = int(s*istone.width)
-    cell_height = int(s*istone.height)
-    
-    table_width = w_num * cell_width
-    table_height = h_num * cell_height
-    
-    # Open the window. Set the window title and dimensions (width and height)
-    arcade.open_window(table_width, table_height + top_block_h, "Deletion 44")
-    
-    # Set the background color to white
-    # For a list of named colors see
-    # http://arcade.academy/arcade.color.html
-    # Colors can also be specified in (red, green, blue) format and
-    # (red, green, blue, alpha) format.
-    arcade.set_background_color(arcade.color.WHITE)
-    
-    # Start the render process. This must be done before any drawing commands.
-    arcade.start_render()
-    
-    # Draw a grid
-    # Draw vertical lines every 120 pixels
-    for x in range(0, table_width + 1, cell_width):
-        arcade.draw_line(x, 0, x, table_height, arcade.color.BLACK, 1)
-    
-    # Draw horizontal lines every 200 pixels
-    for y in range(0, table_height + 1, cell_height):
-        arcade.draw_line(0, y, table_width, y, arcade.color.BLACK, 1)
-    
-    base_x = cell_width  // 2
-    base_y = cell_height // 2
-    
-    for y in range(h_num):
-        for x in range(w_num):
-            istone = index_to_texture(stone_matrix[y][x])
-            arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
-       
-    # Draw a point
-    #arcade.draw_text("draw_point", 3, 405, arcade.color.BLACK, 12)
-    #arcade.draw_point(60, 495, arcade.color.RED, 10)
-    
-    # Finish the render.
-    # Nothing will be drawn without this.
-    # Must happen after all draw commands
-    arcade.finish_render()
+    window = awindow(table_width, table_height + top_block_h, "Deletion 44")
+    window.setup()   
     
     # Keep the window up until someone closes it.
     arcade.run()
