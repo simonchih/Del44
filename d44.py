@@ -18,6 +18,8 @@ cell_width = int(s*stone.width)
 cell_height = int(s*stone.height)
 table_width = w_num * cell_width
 table_height = h_num * cell_height
+
+stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
     
 class awindow(arcade.Window):
     def __init__(self, width: float = 600, height: float = 640, title: str = 'Arcade Window'):
@@ -33,20 +35,21 @@ class awindow(arcade.Window):
         
         self.selected = 0 # (w, h): selected, 0: NOT
         self.do_clean = 0 # 1: clean, 0: NOT
-        self.stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
         
         # Set the background color to white
         # For a list of named colors see
         # http://arcade.academy/arcade.color.html
         # Colors can also be specified in (red, green, blue) format and
         # (red, green, blue, alpha) format.
-        arcade.set_background_color(arcade.color.WHITE)
+        arcade.set_background_color(arcade.color.ALLOY_ORANGE)
     
     def setup(self):
+        global stone_matrix
+        
         for i in range(h_num):
             for j in range(w_num):
                 v = random.randint(1, 5)
-                self.stone_matrix[j][i] = v
+                stone_matrix[j][i] = v
     
     # True: click mouse button, False: NOT
     def on_click(self, button):
@@ -86,32 +89,34 @@ class awindow(arcade.Window):
                     arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
                   
     def clean(self):
+        global stone_matrix
+        
         self.do_clean = 0
         for w in range(w_num):
             for h in range(h_num):
                 stone_mark = set()
-                stone_mark = calc_seq(self.stone_matrix[w][h], w, h, self.stone_matrix, 0, stone_mark)
+                stone_mark = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 0, stone_mark)
                 if len(stone_mark) >= 5:
                     self.do_clean = 1
                     
                     for st in stone_mark:
                         (sw, sh) = st
                         stone_mark2 = set()
-                        stone_mark2 = calc_seq(self.stone_matrix[sw][sh], sw, sh, self.stone_matrix, 1, stone_mark2)
+                        stone_mark2 = calc_seq(stone_matrix[sw][sh], sw, sh, stone_matrix, 1, stone_mark2)
                     
                         if len(stone_mark2) >= 5:
                             stone_mark = stone_mark | stone_mark2
                 
                 else:
                     stone_mark = set()
-                    stone_mark = calc_seq(self.stone_matrix[w][h], w, h, self.stone_matrix, 1, stone_mark)
+                    stone_mark = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 1, stone_mark)
                     if len(stone_mark) >= 5:
                         self.do_clean = 1
                         
                         for st in stone_mark:
                             (sw, sh) = st
                             stone_mark2 = set()
-                            stone_mark2 = calc_seq(self.stone_matrix[sw][sh], sw, sh, self.stone_matrix, 0, stone_mark2)
+                            stone_mark2 = calc_seq(stone_matrix[sw][sh], sw, sh, stone_matrix, 0, stone_mark2)
                         
                             if len(stone_mark2) >= 5:
                                 stone_mark = stone_mark | stone_mark2
@@ -121,15 +126,19 @@ class awindow(arcade.Window):
                 # clean
                 for st in stone_mark:
                     (sw, sh) = st
-                    self.stone_matrix[sw][sh] = -1
+                    stone_matrix[sw][sh] = -1
     
+    def draw_top(self):
+        arcade.draw_rectangle_filled(table_width//2, table_height + top_block_h//2, table_width, top_block_h, arcade.color.AERO_BLUE)
+        
     # override
     def on_draw(self):    
         arcade.start_render()
         self.draw_table()
-        self.draw_stone(self.stone_matrix)
+        self.draw_stone(stone_matrix)
         self.draw_selected()
         self.clean()
+        self.draw_top()
         
         # Finish the render.
         # Nothing will be drawn without this.
@@ -138,6 +147,8 @@ class awindow(arcade.Window):
         
     # override
     def on_mouse_press(self, x, y, button, modifiers):
+        global stone_matrix
+        
         if 0 == self.do_clean and self.on_click(button):
             if x >= table_width or y >= table_height:
                 self.selected = 0
@@ -150,33 +161,33 @@ class awindow(arcade.Window):
                 
                 if dest_h == org_h:
                     if dest_w == org_w + 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
+                        stone_mark = calc_seq(stone_matrix[dest_w][dest_h], dest_w, dest_h, stone_matrix, 0, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
+                                stone_matrix[dw][dh] = stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
                     elif dest_w == org_w - 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 0, stone_mark)
+                        stone_mark = calc_seq(stone_matrix[dest_w][dest_h], dest_w, dest_h, stone_matrix, 0, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
+                                stone_matrix[dw][dh] = stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
 
                 if dest_w == org_w:
                     if dest_h == org_h + 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
+                        stone_mark = calc_seq(stone_matrix[dest_w][dest_h], dest_w, dest_h, stone_matrix, 1, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
+                                stone_matrix[dw][dh] = stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
                     elif dest_h == org_h - 1:
-                        stone_mark = calc_seq(self.stone_matrix[dest_w][dest_h], dest_w, dest_h, self.stone_matrix, 1, stone_mark)
+                        stone_mark = calc_seq(stone_matrix[dest_w][dest_h], dest_w, dest_h, stone_matrix, 1, stone_mark)
                         if len(stone_mark) >= 3:
                             for (dw, dh) in stone_mark:
-                                self.stone_matrix[dw][dh] = self.stone_matrix[org_w][org_h]
+                                stone_matrix[dw][dh] = stone_matrix[org_w][org_h]
                             #print(stone_mark)
                             stone_mark = set()
                         
