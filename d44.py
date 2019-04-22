@@ -22,9 +22,15 @@ cell_height = int(s*stone.height)
 table_width = w_num * cell_width
 table_height = h_num * cell_height
 
+base_x = cell_width  // 2
+base_y = cell_height // 2
+
 stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
-stone_alpha = [[1.0 for y in range(h_num)] for x in range(w_num)]
+#stone_alpha = [[1.0 for y in range(h_num)] for x in range(w_num)]
+stone_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
+default_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 do_clean = 0 # 1: clean, 0: NOT
+down_occur = 0 # 0: NOT down, 1: stone down
 alpha_mark = set()
     
 class awindow(arcade.Window):
@@ -51,10 +57,15 @@ class awindow(arcade.Window):
     def setup(self):
         global stone_matrix
         
-        for i in range(h_num):
-            for j in range(w_num):
+        for j in range(w_num):
+            for i in range(h_num):
                 v = random.randint(1, 5)
                 stone_matrix[j][i] = v
+                
+                w = base_x + cell_width * j
+                h = base_y + cell_height * i
+                stone_center_cor[j][i] = (w, h)
+                default_center_cor[j][i] = (w, h)
     
     # True: click mouse button, False: NOT
     def on_click(self, button):
@@ -84,14 +95,14 @@ class awindow(arcade.Window):
             arcade.draw_lrtb_rectangle_outline(left = left, right = right, top = top, bottom = bottom, color = arcade.color.ALABAMA_CRIMSON, border_width = 2)        
     
     def draw_stone(self, stone_matrix):
-        base_x = cell_width  // 2
-        base_y = cell_height // 2
+        global stone_center_cor
     
         for x in range(w_num):
             for y in range(h_num):
                 istone = index_to_texture(stone_matrix[x][y])
                 if istone != None:
-                    arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
+                    (w, h) = stone_center_cor[x][y]
+                    arcade.draw_texture_rectangle(w, h, cell_width, cell_height, istone, 0)
                   
     def clean(self):
         global stone_matrix
@@ -155,7 +166,9 @@ class awindow(arcade.Window):
         self.draw_table()
         self.draw_stone(stone_matrix)
         self.draw_selected()
-        self.clean()
+        
+        if 0 == down_occur:
+            self.clean()
         self.draw_top()
         
         # Finish the render.
@@ -167,8 +180,8 @@ class awindow(arcade.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         global stone_matrix
         
-        #if 0 == do_clean and self.on_click(button):
-        if self.on_click(button):
+        if 0 == do_clean and self.on_click(button):
+        #if self.on_click(button):
             if x >= table_width or y >= table_height:
                 self.selected = 0
             elif 0 == self.selected:
@@ -268,12 +281,51 @@ def stone_alpha_zero():
                 
             alpha_mark = set()
         
-        time.sleep(1)
+        time.sleep(0.1)
+
+def down():
+    global down_occur
+    movement = 5# for stone down   
+
+    while(True):
+        time.sleep(0.1)
+        move_process = 0
         
+        for w in range(w_num):
+            for h in range(h_num):
+                if stone_center_cor[w][h] != default_center_cor[w][h]:
+                    move_process = 1
+                    down_occur = 1
+                    (x, y) = stone_center_cor[w][h]
+                    stone_center_cor[w][h] = (x, y - movement)
+                    
+        if 1 == move_process:
+            continue
+        
+        for w in range(w_num):
+            for h in range(h_num):
+                if 0 == stone_matrix[w][h]:
+                    move_process = 1
+                    down_occur = 1
+                    new = random.randint(1, 5)
+                    stone_matrix[w].append(new)
+                    stone_matrix[w][h:] = stone_matrix[w][h+1:]
+                    
+                    (nx, ny) = default_center_cor[w][h_num - 1]
+                    ny += cell_height
+                    stone_center_cor[w].append((nx, ny))
+                    stone_center_cor[w][h:] = stone_center_cor[w][h+1:]
+                    break
+                    
+        if 0 == move_process:
+            down_occur = 0
+            do_clean = 0
+               
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
     window.setup()
     start_new_thread(stone_alpha_zero, ())
+    start_new_thread(down, ())
     
     # Keep the window up until someone closes it.
     arcade.run()
