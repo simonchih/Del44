@@ -5,6 +5,7 @@
 4. Delete stones if there are 5 stones or great have same color in a row or in a column.
 
 ==Chinese Readme==
+
 玩法如下：
 1. 用滑鼠選擇一個石頭，當作來源石
 2. 接下來，用滑鼠選擇一個來源石旁邊(上、下、左、右)的石頭，當作目標石
