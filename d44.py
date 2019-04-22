@@ -86,6 +86,7 @@ class awindow(arcade.Window):
                     arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
                   
     def clean(self):
+        self.do_clean = 0
         for w in range(w_num):
             for h in range(h_num):
                 stone_mark = set()
