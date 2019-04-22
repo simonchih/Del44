@@ -1,6 +1,9 @@
 import arcade
 import os
 import random
+import time
+import copy
+from _thread import *
 
 stone = arcade.load_texture("images/stone_20x20.gif")
 stone_green = arcade.load_texture("images/stone_green_20x20.gif")
@@ -20,6 +23,9 @@ table_width = w_num * cell_width
 table_height = h_num * cell_height
 
 stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
+stone_alpha = [[1.0 for y in range(h_num)] for x in range(w_num)]
+do_clean = 0 # 1: clean, 0: NOT
+alpha_mark = set()
     
 class awindow(arcade.Window):
     def __init__(self, width: float = 600, height: float = 640, title: str = 'Arcade Window'):
@@ -34,7 +40,6 @@ class awindow(arcade.Window):
         os.chdir(file_path)
         
         self.selected = 0 # (w, h): selected, 0: NOT
-        self.do_clean = 0 # 1: clean, 0: NOT
         
         # Set the background color to white
         # For a list of named colors see
@@ -90,14 +95,21 @@ class awindow(arcade.Window):
                   
     def clean(self):
         global stone_matrix
+        global alpha_mark
+        global do_clean
         
-        self.do_clean = 0
+        do_cl = 0
         for w in range(w_num):
             for h in range(h_num):
+                if stone_matrix[w][h] < 1:
+                    do_cl = 1
+                    do_clean = 1
+                
                 stone_mark = set()
                 stone_mark = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 0, stone_mark)
                 if len(stone_mark) >= 5:
-                    self.do_clean = 1
+                    do_cl = 1
+                    do_clean = 1
                     
                     for st in stone_mark:
                         (sw, sh) = st
@@ -111,7 +123,8 @@ class awindow(arcade.Window):
                     stone_mark = set()
                     stone_mark = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 1, stone_mark)
                     if len(stone_mark) >= 5:
-                        self.do_clean = 1
+                        do_cl = 1
+                        do_clean = 1
                         
                         for st in stone_mark:
                             (sw, sh) = st
@@ -123,10 +136,15 @@ class awindow(arcade.Window):
                     else:
                         stone_mark = set()
                 
+                alpha_mark = alpha_mark | stone_mark
                 # clean
-                for st in stone_mark:
-                    (sw, sh) = st
-                    stone_matrix[sw][sh] = -1
+                #for (sw, sh) in stone_mark:
+                #    stone_alpha[sw][sh] = 0.9
+                    
+        if 0 == do_cl:
+            do_clean = 0
+        else:
+            do_clean = 1
     
     def draw_top(self):
         arcade.draw_rectangle_filled(table_width//2, table_height + top_block_h//2, table_width, top_block_h, arcade.color.AERO_BLUE)
@@ -149,7 +167,8 @@ class awindow(arcade.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         global stone_matrix
         
-        if 0 == self.do_clean and self.on_click(button):
+        #if 0 == do_clean and self.on_click(button):
+        if self.on_click(button):
             if x >= table_width or y >= table_height:
                 self.selected = 0
             elif 0 == self.selected:
@@ -229,10 +248,32 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
             return stone_mark
     else:
         return set()   
+
+def stone_alpha_zero():
+    global alpha_mark
+    #alpha_minus = 0
+
+    while(True):
+        #for w in range(w_num):
+        #    for h in range(h_num):
+        #        if stone_alpha[w][h] != 1.0 and stone_alpha[w][h] > 0:
+        #            #alpha_minus = 1
+        #            #stone_alpha[w][h] -= 0.1
+        #            alpha_mark.add((w, h))               
+    
+        if alpha_mark != set():
+            for (w, h) in alpha_mark:
+                #stone_alpha[w][h] = 1.0
+                stone_matrix[w][h] = 0
+                
+            alpha_mark = set()
+        
+        time.sleep(1)
         
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
-    window.setup()   
+    window.setup()
+    start_new_thread(stone_alpha_zero, ())
     
     # Keep the window up until someone closes it.
     arcade.run()
