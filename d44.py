@@ -32,6 +32,7 @@ class awindow(arcade.Window):
         os.chdir(file_path)
         
         self.selected = 0 # (w, h): selected, 0: NOT
+        self.do_clean = 0 # 1: clean, 0: NOT
         self.stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
         
         # Set the background color to white
@@ -81,14 +82,53 @@ class awindow(arcade.Window):
         for x in range(w_num):
             for y in range(h_num):
                 istone = index_to_texture(stone_matrix[x][y])
-                arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
+                if istone != None:
+                    arcade.draw_texture_rectangle(base_x + cell_width * x, base_y + cell_height * y, cell_width, cell_height, istone, 0)
                   
+    def clean(self):
+        for w in range(w_num):
+            for h in range(h_num):
+                stone_mark = set()
+                stone_mark = calc_seq(self.stone_matrix[w][h], w, h, self.stone_matrix, 0, stone_mark)
+                if len(stone_mark) >= 5:
+                    self.do_clean = 1
+                    
+                    for st in stone_mark:
+                        (sw, sh) = st
+                        stone_mark2 = set()
+                        stone_mark2 = calc_seq(self.stone_matrix[sw][sh], sw, sh, self.stone_matrix, 1, stone_mark2)
+                    
+                        if len(stone_mark2) >= 5:
+                            stone_mark = stone_mark | stone_mark2
+                
+                else:
+                    stone_mark = set()
+                    stone_mark = calc_seq(self.stone_matrix[w][h], w, h, self.stone_matrix, 1, stone_mark)
+                    if len(stone_mark) >= 5:
+                        self.do_clean = 1
+                        
+                        for st in stone_mark:
+                            (sw, sh) = st
+                            stone_mark2 = set()
+                            stone_mark2 = calc_seq(self.stone_matrix[sw][sh], sw, sh, self.stone_matrix, 0, stone_mark2)
+                        
+                            if len(stone_mark2) >= 5:
+                                stone_mark = stone_mark | stone_mark2
+                    else:
+                        stone_mark = set()
+                
+                # clean
+                for st in stone_mark:
+                    (sw, sh) = st
+                    self.stone_matrix[sw][sh] = -1
+    
     # override
     def on_draw(self):    
         arcade.start_render()
         self.draw_table()
         self.draw_stone(self.stone_matrix)
         self.draw_selected()
+        self.clean()
         
         # Finish the render.
         # Nothing will be drawn without this.
@@ -97,7 +137,7 @@ class awindow(arcade.Window):
         
     # override
     def on_mouse_press(self, x, y, button, modifiers):
-        if self.on_click(button):
+        if 0 == self.do_clean and self.on_click(button):
             if x >= table_width or y >= table_height:
                 self.selected = 0
             elif 0 == self.selected:
@@ -142,7 +182,9 @@ class awindow(arcade.Window):
                 self.selected = 0
 
 def index_to_texture(index):
-    if 0 == index:
+    if -1 == index:
+        return None
+    elif 0 == index:
         return None
     elif 1 == index:
         return stone_green
@@ -157,11 +199,14 @@ def index_to_texture(index):
 
 # dir: 0, horizontal. 1, vertical
 def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
-    stone_value = stone_matrix[ow][oh]
-    
-    if 0 == index_to_texture(stone_value):
-        return stone_mark
+
+    if ow >= w_num or oh >= h_num or ow < 0 or oh < 0:
+        return set()
+    elif None == index_to_texture(stone_matrix[ow][oh]):
+        return set()
     elif (ow, oh) not in stone_mark:
+        stone_value = stone_matrix[ow][oh]
+        
         if ovalue == stone_value:
             stone_mark.add((ow, oh))
             if 0 == dir:
@@ -171,7 +216,7 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
         else:
             return stone_mark
     else:
-        return stone_mark    
+        return set()   
         
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
