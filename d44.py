@@ -34,6 +34,7 @@ default_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 do_clean = 0 # 1: clean, 0: NOT
 down_occur = 0 # 0: NOT down, 1: stone down
 score = 0
+add_done = False # True: end add score. False: wait to add score
 calc_del_score = []
     
 class awindow(arcade.Window):
@@ -157,7 +158,7 @@ class awindow(arcade.Window):
                     else:
                         stone_mark = set()
                 
-                if alpha_mark & stone_mark == set():
+                if alpha_mark & stone_mark == set() and stone_mark != set():
                     calc_del_score.append(stone_mark)
                     alpha_mark = alpha_mark | stone_mark
                     
@@ -298,6 +299,7 @@ def stone_alpha_zero():
     global stone_alpha
     global score
     global calc_del_score
+    global add_done
     alpha_minus = 25
 
     while(True):
@@ -305,14 +307,17 @@ def stone_alpha_zero():
             for h in range(h_num):
                 if stone_alpha[w][h] != 255 and stone_alpha[w][h] > 0:
                     stone_alpha[w][h] -= alpha_minus              
-    
+        
         if calc_del_score != []:
             for s in calc_del_score:
-                score += add_score(len(s))
+                if not add_done:
+                    score += add_score(len(s))
+                    add_done = True
                 for (w, h) in s:
                     if 0 == stone_alpha[w][h]: 
                         stone_matrix[w][h] = 0
                         stone_alpha[w][h] = 255
+                        add_done = False
                 
             calc_del_score= []
         
