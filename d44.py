@@ -27,6 +27,8 @@ table_height = h_num * cell_height
 base_x = cell_width  // 2
 base_y = cell_height // 2
 
+alpha_begin_minus = 200
+
 stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
 stone_alpha = [[255 for y in range(h_num)] for x in range(w_num)]
 stone_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
@@ -81,11 +83,11 @@ class awindow(arcade.Window):
     
     
     def draw_table(self):
-        # Draw vertical lines every 120 pixels
+        # Draw vertical lines
         for x in range(0, table_width + 1, cell_width):
             arcade.draw_line(x, 0, x, table_height, arcade.color.BLACK, 1)
         
-        # Draw horizontal lines every 200 pixels
+        # Draw horizontal lines
         for y in range(0, table_height + 1, cell_height):
             arcade.draw_line(0, y, table_width, y, arcade.color.BLACK, 1)
         
@@ -165,7 +167,7 @@ class awindow(arcade.Window):
                 # clean
                 for (sw, sh) in stone_mark:
                     if 255 == stone_alpha[sw][sh]:
-                        stone_alpha[sw][sh] = 200
+                        stone_alpha[sw][sh] = alpha_begin_minus
                     
         if 0 == do_cl:
             do_clean = 0
