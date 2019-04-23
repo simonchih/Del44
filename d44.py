@@ -2,7 +2,7 @@ import arcade
 import os
 import random
 import time
-import copy
+#import copy
 from _thread import *
 
 stone = arcade.load_texture("images/stone_20x20.gif")
@@ -28,7 +28,7 @@ base_x = cell_width  // 2
 base_y = cell_height // 2
 
 stone_matrix = [[0 for y in range(h_num)] for x in range(w_num)]
-#stone_alpha = [[1.0 for y in range(h_num)] for x in range(w_num)]
+stone_alpha = [[255 for y in range(h_num)] for x in range(w_num)]
 stone_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 default_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 do_clean = 0 # 1: clean, 0: NOT
@@ -110,10 +110,11 @@ class awindow(arcade.Window):
                 istone = index_to_texture(stone_matrix[x][y])
                 if istone != None:
                     (w, h) = stone_center_cor[x][y]
-                    arcade.draw_texture_rectangle(w, h, cell_width, cell_height, istone, 0)
+                    arcade.draw_texture_rectangle(w, h, cell_width, cell_height, istone, 0, stone_alpha[x][y])
                   
     def clean(self):
         global stone_matrix
+        global stone_alpha
         global do_clean
         global calc_del_score
                 
@@ -161,8 +162,9 @@ class awindow(arcade.Window):
                     alpha_mark = alpha_mark | stone_mark
                     
                 # clean
-                #for (sw, sh) in stone_mark:
-                #    stone_alpha[sw][sh] = 0.9
+                for (sw, sh) in stone_mark:
+                    if 255 == stone_alpha[sw][sh]:
+                        stone_alpha[sw][sh] = 200
                     
         if 0 == do_cl:
             do_clean = 0
@@ -293,24 +295,24 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
         return set()   
 
 def stone_alpha_zero():
+    global stone_alpha
     global score
     global calc_del_score
-    #alpha_minus = 0
+    alpha_minus = 25
 
     while(True):
-        #for w in range(w_num):
-        #    for h in range(h_num):
-        #        if stone_alpha[w][h] != 1.0 and stone_alpha[w][h] > 0:
-        #            #alpha_minus = 1
-        #            #stone_alpha[w][h] -= 0.1
-        #            alpha_mark.add((w, h))               
+        for w in range(w_num):
+            for h in range(h_num):
+                if stone_alpha[w][h] != 255 and stone_alpha[w][h] > 0:
+                    stone_alpha[w][h] -= alpha_minus              
     
         if calc_del_score != []:
             for s in calc_del_score:
                 score += add_score(len(s))
                 for (w, h) in s:
-                    #stone_alpha[w][h] = 1.0
-                    stone_matrix[w][h] = 0
+                    if 0 == stone_alpha[w][h]: 
+                        stone_matrix[w][h] = 0
+                        stone_alpha[w][h] = 255
                 
             calc_del_score= []
         
