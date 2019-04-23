@@ -11,6 +11,8 @@ stone_yellow = arcade.load_texture("images/stone_yellow_20x20.gif")
 stone_red = arcade.load_texture("images/stone_red_20x20.gif")
 stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
 
+sclick = arcade.load_sound("sounds/Sound_CLICK.WAV")
+
 h_num = 20
 w_num = 20
 
@@ -46,6 +48,7 @@ class awindow(arcade.Window):
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
         
+        self.first_sel = True
         self.selected = 0 # (w, h): selected, 0: NOT
         
         # Set the background color to white
@@ -87,6 +90,10 @@ class awindow(arcade.Window):
         
     def draw_selected(self):
         if self.selected != 0:
+            if True == self.first_sel:
+                arcade.play_sound(sclick)
+                self.first_sel = False
+        
             (w, h) = self.selected
             left = w * cell_width
             right = left + cell_width
@@ -193,6 +200,7 @@ class awindow(arcade.Window):
         #if self.on_click(button):
             if x >= table_width or y >= table_height:
                 self.selected = 0
+                self.first_sel = True
             elif 0 == self.selected:
                 self.selected = (x // 30, y // 30)
             else:
@@ -233,6 +241,7 @@ class awindow(arcade.Window):
                             stone_mark = set()
                         
                 self.selected = 0
+                self.first_sel = True
 
 def index_to_texture(index):
     if -1 == index:
