@@ -31,6 +31,7 @@ stone_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 default_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 do_clean = 0 # 1: clean, 0: NOT
 down_occur = 0 # 0: NOT down, 1: stone down
+score = 0
 alpha_mark = set()
     
 class awindow(arcade.Window):
@@ -158,7 +159,11 @@ class awindow(arcade.Window):
             do_clean = 1
     
     def draw_top(self):
+        (sc_x, sc_y) = (470, table_height + 10)
+        
         arcade.draw_rectangle_filled(table_width//2, table_height + top_block_h//2, table_width, top_block_h, arcade.color.AERO_BLUE)
+        
+        arcade.draw_text("SCORE   %10d" % (score % 10000000000), sc_x, sc_y, arcade.color.BLACK, 12)
         
     # override
     def on_draw(self):    
@@ -241,6 +246,18 @@ def index_to_texture(index):
     elif 5 == index:
         return stone
 
+def add_score(num):
+    if 5 == num:
+        return 5
+    elif 10 > num > 5:
+        return num * num
+    elif 14 > num >= 10:
+        return num * num * num
+    elif 44 > num >= 14:
+        return num * num * num * num
+    else:
+        return num * num * num * num * num
+
 # dir: 0, horizontal. 1, vertical
 def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
 
@@ -264,6 +281,7 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
 
 def stone_alpha_zero():
     global alpha_mark
+    global score
     #alpha_minus = 0
 
     while(True):
@@ -275,6 +293,7 @@ def stone_alpha_zero():
         #            alpha_mark.add((w, h))               
     
         if alpha_mark != set():
+            score += add_score(len(alpha_mark))
             for (w, h) in alpha_mark:
                 #stone_alpha[w][h] = 1.0
                 stone_matrix[w][h] = 0
