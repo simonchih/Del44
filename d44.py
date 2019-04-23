@@ -321,7 +321,7 @@ def down():
     movement = 5# for stone down   
 
     while(True):
-        time.sleep(0.1)
+        time.sleep(0.05)
         move_process = 0
         
         for w in range(w_num):
