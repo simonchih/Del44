@@ -32,7 +32,7 @@ default_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 do_clean = 0 # 1: clean, 0: NOT
 down_occur = 0 # 0: NOT down, 1: stone down
 score = 0
-alpha_mark = set()
+calc_del_score = []
     
 class awindow(arcade.Window):
     def __init__(self, width: float = 600, height: float = 640, title: str = 'Arcade Window'):
@@ -107,9 +107,10 @@ class awindow(arcade.Window):
                   
     def clean(self):
         global stone_matrix
-        global alpha_mark
         global do_clean
-        
+        global calc_del_score
+                
+        alpha_mark = set()
         do_cl = 0
         for w in range(w_num):
             for h in range(h_num):
@@ -148,7 +149,10 @@ class awindow(arcade.Window):
                     else:
                         stone_mark = set()
                 
-                alpha_mark = alpha_mark | stone_mark
+                if alpha_mark & stone_mark == set():
+                    calc_del_score.append(stone_mark)
+                    alpha_mark = alpha_mark | stone_mark
+                    
                 # clean
                 #for (sw, sh) in stone_mark:
                 #    stone_alpha[sw][sh] = 0.9
@@ -280,8 +284,8 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
         return set()   
 
 def stone_alpha_zero():
-    global alpha_mark
     global score
+    global calc_del_score
     #alpha_minus = 0
 
     while(True):
@@ -292,13 +296,14 @@ def stone_alpha_zero():
         #            #stone_alpha[w][h] -= 0.1
         #            alpha_mark.add((w, h))               
     
-        if alpha_mark != set():
-            score += add_score(len(alpha_mark))
-            for (w, h) in alpha_mark:
-                #stone_alpha[w][h] = 1.0
-                stone_matrix[w][h] = 0
+        if calc_del_score != []:
+            for s in calc_del_score:
+                score += add_score(len(s))
+                for (w, h) in s:
+                    #stone_alpha[w][h] = 1.0
+                    stone_matrix[w][h] = 0
                 
-            alpha_mark = set()
+            calc_del_score= []
         
         time.sleep(0.1)
 
