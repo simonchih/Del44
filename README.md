@@ -4,7 +4,7 @@ The name of game is "Deletion 44" as it can delete 44 neighbor stones with same 
 1. Select a source stone by mouse button clicked.
 2. Then, select a target stone that neighbors a source stone (up, down, left, right) by mouse button clicked. 
 3. If target stones have more than 3 stones as same color in a row (for right or left neighbor) or in a column (for up or down neighbor), copy the color of source stone to target stones. Otherwise, go to step 1.
-4. Delete stones if there are 5 stones or great have same color in a row or in a column.
+4. Delete stones if there are 5 stones or greater have same color in a row or in a column.
 
 ==Chinese Readme==
 
