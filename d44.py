@@ -2,7 +2,7 @@ import arcade
 import os
 import random
 import time
-#import copy
+import copy
 from _thread import *
 
 stone = arcade.load_texture("images/stone_20x20.gif")
@@ -313,8 +313,10 @@ def stone_alpha_zero():
                     stone_alpha[w][h] = 255
         
         if calc_del_score != []:
+            #print(calc_del_score)
+            copy_del_score = copy.deepcopy(calc_del_score)
             
-            for s in calc_del_score:
+            for s in copy_del_score:
                 add_done = True # NOT add score
                 
                 for (w, h) in s:
