@@ -313,18 +313,17 @@ def stone_alpha_zero():
                     stone_alpha[w][h] = 255
         
         if calc_del_score != []:
-            add_done = True # NOT add score
+            
             for s in calc_del_score:
+                add_done = True # NOT add score
+                
                 for (w, h) in s:
                     if 255 == stone_alpha[w][h] and 0 == stone_matrix[w][h]:
                         add_done = False # wait to add score
                         
                 if not add_done:
                     score += add_score(len(s))
-                    add_done = True # End add score
-                
-                
-            calc_del_score= []
+                    calc_del_score.remove(s)
         
         time.sleep(0.1)
 
