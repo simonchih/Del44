@@ -36,7 +36,6 @@ default_center_cor = [[(0, 0) for y in range(h_num)] for x in range(w_num)]
 do_clean = 0 # 1: clean, 0: NOT
 down_occur = 0 # 0: NOT down, 1: stone down
 score = 0
-add_done = False # True: end add score. False: wait to add score
 calc_del_score = []
     
 class awindow(arcade.Window):
@@ -112,8 +111,8 @@ class awindow(arcade.Window):
             for y in range(h_num):
                 istone = index_to_texture(stone_matrix[x][y])
                 if istone != None:
-                    (w, h) = stone_center_cor[x][y]
-                    arcade.draw_texture_rectangle(w, h, cell_width, cell_height, istone, 0, stone_alpha[x][y])
+                    (w_cor, h_cor) = stone_center_cor[x][y]
+                    arcade.draw_texture_rectangle(w_cor, h_cor, cell_width, cell_height, istone, 0, stone_alpha[x][y])
                   
     def clean(self):
         global stone_matrix
@@ -301,25 +300,29 @@ def stone_alpha_zero():
     global stone_alpha
     global score
     global calc_del_score
-    global add_done
+
     alpha_minus = 25
 
     while(True):
         for w in range(w_num):
             for h in range(h_num):
                 if stone_alpha[w][h] != 255 and stone_alpha[w][h] > 0:
-                    stone_alpha[w][h] -= alpha_minus              
+                    stone_alpha[w][h] -= alpha_minus
+                elif 0 == stone_alpha[w][h]:
+                    stone_matrix[w][h] = 0
+                    stone_alpha[w][h] = 255
         
         if calc_del_score != []:
+            add_done = True # NOT add score
             for s in calc_del_score:
+                for (w, h) in s:
+                    if 0 == stone_alpha[w][h]:
+                        add_done = False # wait to add score
+                        
                 if not add_done:
                     score += add_score(len(s))
-                    add_done = True
-                for (w, h) in s:
-                    if 0 == stone_alpha[w][h]: 
-                        stone_matrix[w][h] = 0
-                        stone_alpha[w][h] = 255
-                        add_done = False
+                    add_done = True # End add score
+                
                 
             calc_del_score= []
         
@@ -362,12 +365,46 @@ def down():
         if 0 == move_process:
             down_occur = 0
             do_clean = 0
-               
+
+def check_hard_del():
+    global stone_alpha
+    global calc_del_score
+    
+    while True:
+        time.sleep(1)
+        
+        stone_mw = set()
+        stone_mh = set()
+        del_num = 0
+        
+        if 1 == do_clean or 1 == down_occur:
+            continue
+        
+        for w in range(w_num):
+            for h in range(h_num):
+                stone_mw = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 0, stone_mw)
+                stone_mh = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 1, stone_mh)
+                
+                if len(stone_mw) >= 3:
+                    del_num += 1
+                if len(stone_mh) >= 3:
+                    del_num += 1
+                    
+        #print(del_num)
+        if del_num < 3:
+            # delete all
+            for w in range(w_num):
+                for h in range(h_num):
+                    stone_alpha[w][h] = alpha_begin_minus
+            
+            time.sleep(3)
+    
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
     window.setup()
     start_new_thread(stone_alpha_zero, ())
     start_new_thread(down, ())
+    start_new_thread(check_hard_del, ())
     
     # Keep the window up until someone closes it.
     arcade.run()
