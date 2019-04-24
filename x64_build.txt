@@ -1,0 +1,54 @@
+用Python x64時，如果出現類似以下錯誤：
+
+Unexpected error loading library avutil-56: [WinError 193] %1 不是有效的 Win32 應用程式。
+Traceback (most recent call last):
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\__init__.py", line 351, in __getattr__
+    return getattr(self._module, name)
+AttributeError: 'NoneType' object has no attribute 'exceptions'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\temp\del44\d44.py", line 1, in <module>
+    import arcade
+  File "C:\Program Files\Python37\lib\site-packages\arcade\__init__.py", line 23, in <module>
+    from arcade.application import *
+  File "C:\Program Files\Python37\lib\site-packages\arcade\application.py", line 8, in <module>
+    from arcade.window_commands import set_viewport
+  File "C:\Program Files\Python37\lib\site-packages\arcade\window_commands.py", line 11, in <module>
+    from arcade.monkey_patch_pyglet import *
+  File "C:\Program Files\Python37\lib\site-packages\arcade\monkey_patch_pyglet.py", line 3, in <module>
+    import arcade.sound_wav_monkeypatch as mps
+  File "C:\Program Files\Python37\lib\site-packages\arcade\sound_wav_monkeypatch.py", line 42, in <module>
+    class WAVEFormatException(pyglet.media.exceptions.MediaFormatException):
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\__init__.py", line 357, in __getattr__
+    __import__(import_name)
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\media\__init__.py", line 144, in <module>
+    add_default_media_codecs()
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\media\codecs\__init__.py", line 141, in add_default_media_codecs
+    if have_ffmpeg():
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\media\codecs\__init__.py", line 157, in have_ffmpeg
+    from . import ffmpeg_lib
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\media\codecs\ffmpeg_lib\__init__.py", line 35, in <module>
+    from .libavcodec import *
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\media\codecs\ffmpeg_lib\libavcodec.py", line 44, in <module>
+    from . import libavutil
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\media\codecs\ffmpeg_lib\libavutil.py", line 48, in <module>
+    darwin='avutil.56'
+  File "C:\Program Files\Python37\lib\site-packages\pyglet\lib.py", line 147, in load_library
+    lib = ctypes.cdll.LoadLibrary(name)
+  File "C:\Program Files\Python37\lib\ctypes\__init__.py", line 434, in LoadLibrary
+    return self._dlltype(name)
+  File "C:\Program Files\Python37\lib\ctypes\__init__.py", line 356, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: [WinError 193] %1 不是有效的 Win32 應用程式。
+
+試著刪除在遊戲目錄下的以下dll:
+avcodec-58.dll 
+avdevice-58.dll 
+avfilter-7.dll 
+avformat-58.dll 
+avutil-56.dll 
+postproc-55.dll 
+swresample-3.dll 
+swscale-5.dll
