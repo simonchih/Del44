@@ -159,7 +159,7 @@ class awindow(arcade.Window):
                     else:
                         stone_mark = set()
                 
-                if alpha_mark & stone_mark == set() and stone_mark != set():
+                if (alpha_mark & stone_mark) == set() and stone_mark != set() and stone_mark not in calc_del_score:
                     calc_del_score.append(stone_mark)
                     alpha_mark = alpha_mark | stone_mark
                     
@@ -316,7 +316,7 @@ def stone_alpha_zero():
             add_done = True # NOT add score
             for s in calc_del_score:
                 for (w, h) in s:
-                    if 0 == stone_alpha[w][h]:
+                    if 255 == stone_alpha[w][h] and 0 == stone_matrix[w][h]:
                         add_done = False # wait to add score
                         
                 if not add_done:
@@ -368,7 +368,6 @@ def down():
 
 def check_hard_del():
     global stone_alpha
-    global calc_del_score
     
     while True:
         time.sleep(1)
