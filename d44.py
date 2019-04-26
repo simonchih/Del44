@@ -279,9 +279,9 @@ def add_score(num):
 def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
 
     if ow >= w_num or oh >= h_num or ow < 0 or oh < 0:
-        return set()
+        return stone_mark
     elif None == index_to_texture(stone_matrix[ow][oh]):
-        return set()
+        return stone_mark
     elif (ow, oh) not in stone_mark:
         stone_value = stone_matrix[ow][oh]
         
@@ -294,7 +294,7 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
         else:
             return stone_mark
     else:
-        return set()   
+        return stone_mark  
 
 def stone_alpha_zero():
     global stone_alpha
@@ -302,15 +302,20 @@ def stone_alpha_zero():
     global calc_del_score
 
     alpha_minus = 25
+    dtime = 0.1
 
     while(True):
+        time.sleep(dtime)
+        
         for w in range(w_num):
             for h in range(h_num):
                 if stone_alpha[w][h] != 255 and stone_alpha[w][h] > 0:
                     stone_alpha[w][h] -= alpha_minus
+                    dtime = 0.1
                 elif 0 == stone_alpha[w][h]:
                     stone_matrix[w][h] = 0
                     stone_alpha[w][h] = 255
+                    dtime = 0.1
         
         if calc_del_score != []:
             #print(calc_del_score)
@@ -326,15 +331,17 @@ def stone_alpha_zero():
                 if not add_done:
                     score += add_score(len(s))
                     calc_del_score.remove(s)
+                    dtime = 0.5
         
-        time.sleep(0.1)
+        
 
 def down():
     global down_occur
-    movement = 5# for stone down   
+    movement = 5# for stone down
+    dtime = 0.1
 
     while(True):
-        time.sleep(0.05)
+        time.sleep(dtime)
         move_process = 0
         
         for w in range(w_num):
@@ -344,6 +351,7 @@ def down():
                     down_occur = 1
                     (x, y) = stone_center_cor[w][h]
                     stone_center_cor[w][h] = (x, y - movement)
+                    dtime = 0.1
                     
         if 1 == move_process:
             continue
@@ -361,17 +369,19 @@ def down():
                     ny += cell_height
                     stone_center_cor[w].append((nx, ny))
                     stone_center_cor[w][h:] = stone_center_cor[w][h+1:]
+                    dtime = 0.1
                     break
                     
         if 0 == move_process:
             down_occur = 0
             do_clean = 0
+            dtime = 1
 
 def check_hard_del():
     global stone_alpha
     
     while True:
-        time.sleep(1)
+        time.sleep(2)
         
         stone_mw = set()
         stone_mh = set()
@@ -397,7 +407,7 @@ def check_hard_del():
                 for h in range(h_num):
                     stone_alpha[w][h] = alpha_begin_minus
             
-            time.sleep(3)
+            time.sleep(5)
     
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
