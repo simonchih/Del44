@@ -294,7 +294,7 @@ def calc_seq(ovalue, ow, oh, stone_matrix, dir, stone_mark):
         else:
             return stone_mark
     else:
-        return stone_mark  
+        return set() 
 
 def stone_alpha_zero():
     global stone_alpha
