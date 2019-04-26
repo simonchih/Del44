@@ -12,6 +12,8 @@ stone_red = arcade.load_texture("images/stone_red_20x20.gif")
 stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
 
 sclick = arcade.load_sound("sounds/Sound_CLICK.WAV")
+sclean = arcade.load_sound("sounds/message_send_009.wav")
+sall_clean = arcade.load_sound("sounds/alert_gen_echo_011.wav")
 
 h_num = 20
 w_num = 20
@@ -329,6 +331,7 @@ def stone_alpha_zero():
                         add_done = False # wait to add score
                         
                 if not add_done:
+                    arcade.play_sound(sclean)
                     score += add_score(len(s))
                     calc_del_score.remove(s)
                     dtime = 0.5
@@ -401,8 +404,10 @@ def check_hard_del():
                     del_num += 1
                     
         #print(del_num)
-        if del_num < 3:
+        if del_num < 9:
             # delete all
+            arcade.play_sound(sall_clean)
+            
             for w in range(w_num):
                 for h in range(h_num):
                     stone_alpha[w][h] = alpha_begin_minus
