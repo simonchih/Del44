@@ -322,7 +322,7 @@ def stone_alpha_zero():
         if calc_del_score != []:
             #print(calc_del_score)
             copy_del_score = copy.deepcopy(calc_del_score)
-            print(len(copy_del_score))
+            #print(len(copy_del_score))
             
             for s in copy_del_score:
                 add_done = True # NOT add score
@@ -406,6 +406,7 @@ def check_hard_del():
                     del_num += 1
                     
         #print(del_num)
+        #if True:
         if del_num < 9:
             # delete all
             arcade.play_sound(sall_clean)
