@@ -39,6 +39,7 @@ do_clean = 0 # 1: clean, 0: NOT
 down_occur = 0 # 0: NOT down, 1: stone down
 score = 0
 calc_del_score = []
+game_begin = True
     
 class awindow(arcade.Window):
     def __init__(self, width: float = 600, height: float = 640, title: str = 'Arcade Window'):
@@ -143,7 +144,6 @@ class awindow(arcade.Window):
                     
                         if len(stone_mark2) >= 5:
                             stone_mark = stone_mark | stone_mark2
-                
                 else:
                     stone_mark = set()
                     stone_mark = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 1, stone_mark)
@@ -322,6 +322,7 @@ def stone_alpha_zero():
         if calc_del_score != []:
             #print(calc_del_score)
             copy_del_score = copy.deepcopy(calc_del_score)
+            print(len(copy_del_score))
             
             for s in copy_del_score:
                 add_done = True # NOT add score
@@ -347,38 +348,39 @@ def down():
         time.sleep(dtime)
         move_process = 0
         
-        for w in range(w_num):
-            for h in range(h_num):
-                if stone_center_cor[w][h] != default_center_cor[w][h]:
-                    move_process = 1
-                    down_occur = 1
-                    (x, y) = stone_center_cor[w][h]
-                    stone_center_cor[w][h] = (x, y - movement)
-                    dtime = 0.07
-                    
-        if 1 == move_process:
-            continue
-        
-        for w in range(w_num):
-            for h in range(h_num):
-                if 0 == stone_matrix[w][h]:
-                    move_process = 1
-                    down_occur = 1
-                    new = random.randint(1, 5)
-                    stone_matrix[w].append(new)
-                    stone_matrix[w][h:] = stone_matrix[w][h+1:]
-                    
-                    (nx, ny) = default_center_cor[w][h_num - 1]
-                    ny += cell_height
-                    stone_center_cor[w].append((nx, ny))
-                    stone_center_cor[w][h:] = stone_center_cor[w][h+1:]
-                    dtime = 0.07
-                    break
-                    
-        if 0 == move_process:
-            down_occur = 0
-            do_clean = 0
-            dtime = 1
+        if [] == calc_del_score:
+            for w in range(w_num):
+                for h in range(h_num):
+                    if stone_center_cor[w][h] != default_center_cor[w][h]:
+                        move_process = 1
+                        down_occur = 1
+                        (x, y) = stone_center_cor[w][h]
+                        stone_center_cor[w][h] = (x, y - movement)
+                        dtime = 0.07
+                        
+            if 1 == move_process:
+                continue
+            
+            for w in range(w_num):
+                for h in range(h_num):
+                    if 0 == stone_matrix[w][h]:
+                        move_process = 1
+                        down_occur = 1
+                        new = random.randint(1, 5)
+                        stone_matrix[w].append(new)
+                        stone_matrix[w][h:] = stone_matrix[w][h+1:]
+                        
+                        (nx, ny) = default_center_cor[w][h_num - 1]
+                        ny += cell_height
+                        stone_center_cor[w].append((nx, ny))
+                        stone_center_cor[w][h:] = stone_center_cor[w][h+1:]
+                        dtime = 0.07
+                        break
+                        
+            if 0 == move_process:
+                down_occur = 0
+                do_clean = 0
+                dtime = 1
 
 def check_hard_del():
     global stone_alpha

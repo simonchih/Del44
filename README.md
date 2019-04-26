@@ -1,4 +1,5 @@
-The name of game is "Deletion 44" as it can delete 44 neighbor stones with same color at most.
+The name of game is "Deletion 44" as it can delete 44 neighbor stones with same color at most. 
+(except game begin)
 
 ==Rules==
 1. Select a source stone by mouse button clicked.
@@ -8,7 +9,7 @@ The name of game is "Deletion 44" as it can delete 44 neighbor stones with same 
 
 ==Chinese Readme==
 
-這個遊戲我取名叫Deletion 44，因為一次最多消去44個相鄰的同色石頭。
+這個遊戲我取名叫Deletion 44，因為除了遊戲一開始，一次最多消去44個相鄰的同色石頭。
 
 玩法如下：
 1. 用滑鼠選擇一個石頭，當作來源石
