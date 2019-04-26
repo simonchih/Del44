@@ -388,8 +388,6 @@ def check_hard_del():
     while True:
         time.sleep(2)
         
-        stone_mw = set()
-        stone_mh = set()
         del_num = 0
         
         if 1 == do_clean or 1 == down_occur:
@@ -397,6 +395,8 @@ def check_hard_del():
         
         for w in range(w_num):
             for h in range(h_num):
+                stone_mw = set()
+                stone_mh = set()
                 stone_mw = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 0, stone_mw)
                 stone_mh = calc_seq(stone_matrix[w][h], w, h, stone_matrix, 1, stone_mh)
                 
