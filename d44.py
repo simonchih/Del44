@@ -338,7 +338,7 @@ def stone_alpha_zero():
 def down():
     global down_occur
     movement = 5# for stone down
-    dtime = 0.1
+    dtime = 0.07
 
     while(True):
         time.sleep(dtime)
@@ -351,7 +351,7 @@ def down():
                     down_occur = 1
                     (x, y) = stone_center_cor[w][h]
                     stone_center_cor[w][h] = (x, y - movement)
-                    dtime = 0.1
+                    dtime = 0.07
                     
         if 1 == move_process:
             continue
@@ -369,7 +369,7 @@ def down():
                     ny += cell_height
                     stone_center_cor[w].append((nx, ny))
                     stone_center_cor[w][h:] = stone_center_cor[w][h+1:]
-                    dtime = 0.1
+                    dtime = 0.07
                     break
                     
         if 0 == move_process:
