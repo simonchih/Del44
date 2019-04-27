@@ -312,9 +312,9 @@ def stone_alpha_zero():
         for w in range(w_num):
             for h in range(h_num):
                 if stone_alpha[w][h] != 255 and stone_alpha[w][h] > 0:
-                    stone_alpha[w][h] -= alpha_minus
+                    stone_alpha[w][h] = stone_alpha[w][h] - alpha_minus if stone_alpha[w][h] - alpha_minus >= 0 else 0
                     dtime = 0.1
-                elif 0 == stone_alpha[w][h]:
+                elif stone_alpha[w][h] <= 0:
                     stone_matrix[w][h] = 0
                     stone_alpha[w][h] = 255
                     dtime = 0.1
