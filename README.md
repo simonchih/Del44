@@ -1,5 +1,4 @@
-The name of game is "Deletion 44" as it can delete 44 neighbor stones with same color at most. 
-(except game begin)
+The name of game is "Deletion 44" as it can delete 44 same color neighbor stones at most by copy action. 
 
 ==Rules==
 1. Select a source stone by mouse button clicked.
@@ -9,7 +8,9 @@ The name of game is "Deletion 44" as it can delete 44 neighbor stones with same 
 
 ==Chinese Readme==
 
-這個遊戲我取名叫Deletion 44，因為除了遊戲一開始，一次最多消去44個相鄰的同色石頭。
+這個遊戲我取名叫Deletion 44，因為使用複製動作(手動)來消除時，一次最多消去44個相鄰的同色石頭。
+當不是手動消除時，有一些情況可能超過44個，例如遊戲一開始、或者石頭自動下降許多同色石頭時，
+有可能消除超過44個，但是此種情況非常少見。
 
 玩法如下：
 1. 用滑鼠選擇一個石頭，當作來源石
@@ -22,7 +23,7 @@ The name of game is "Deletion 44" as it can delete 44 neighbor stones with same 
 2. 消除6到9個石頭，得到消除個數的平方分數，例如6個，是6 * 6=36分
 3. 消除10到13個石頭，得到消除個數的三次方分數，例如10個，是10 * 10 * 10 = 1000分
 4. 消除14到43個石頭，得到消除個數的四次方分數，例如15個，是15 * 15 * 15 * 15 = 50625分
-5. 消除44個石頭，得到五次方分數，即44 * 44 * 44 * 44 * 44 = 164916224分
+5. 消除44個石頭或以上，得到五次方分數，例如44個，分數是44 * 44 * 44 * 44 * 44 = 164916224分
 
 全部消除?
 如果同色的石頭太少，造成難以消除，會啟動全部消除，但此時只消除，不記分。
