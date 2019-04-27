@@ -327,9 +327,11 @@ def stone_alpha_zero():
             for s in copy_del_score:
                 add_done = True # NOT add score
                 
+                # Check only one element in set s
                 for (w, h) in s:
                     if 255 == stone_alpha[w][h] and 0 == stone_matrix[w][h]:
                         add_done = False # wait to add score
+                    break
                         
                 if not add_done:
                     arcade.play_sound(sclean)
