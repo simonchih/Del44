@@ -11,9 +11,10 @@ stone_yellow = arcade.load_texture("images/stone_yellow_20x20.gif")
 stone_red = arcade.load_texture("images/stone_red_20x20.gif")
 stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
 
-sclick = arcade.Sound("sounds/Sound_CLICK.WAV", streaming=True)
-sclean = arcade.Sound("sounds/message_send_009.wav", streaming=True)
-sall_clean = arcade.Sound("sounds/alert_gen_echo_011.wav", streaming=True)
+# Get play more than once defect while streaming=True
+sclick = arcade.Sound("sounds/Sound_CLICK.WAV")
+sclean = arcade.Sound("sounds/message_send_009.wav")
+sall_clean = arcade.Sound("sounds/alert_gen_echo_011.wav")
 
 h_num = 20
 w_num = 20
