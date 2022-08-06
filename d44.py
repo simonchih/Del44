@@ -177,10 +177,10 @@ class awindow(arcade.Window):
             do_clean = 1
     
     def draw_top(self):
-        (sc_x, sc_y) = (table_width - 150, table_height + 10)
+        (sc_x, sc_y) = (table_width - 170, table_height + 10)
         
         arcade.draw_rectangle_filled(table_width//2, table_height + top_block_h//2, table_width, top_block_h, arcade.color.AERO_BLUE)
-        
+
         arcade.draw_text("SCORE   %10d" % (score % 10000000000), sc_x, sc_y, arcade.color.BLACK, 12)
         
     # override
