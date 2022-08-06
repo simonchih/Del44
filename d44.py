@@ -11,9 +11,9 @@ stone_yellow = arcade.load_texture("images/stone_yellow_20x20.gif")
 stone_red = arcade.load_texture("images/stone_red_20x20.gif")
 stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
 
-sclick = arcade.load_sound("sounds/Sound_CLICK.WAV")
-sclean = arcade.load_sound("sounds/message_send_009.wav")
-sall_clean = arcade.load_sound("sounds/alert_gen_echo_011.wav")
+sclick = arcade.Sound("sounds/Sound_CLICK.WAV", streaming=True)
+sclean = arcade.Sound("sounds/message_send_009.wav", streaming=True)
+sall_clean = arcade.Sound("sounds/alert_gen_echo_011.wav", streaming=True)
 
 h_num = 20
 w_num = 20
@@ -96,7 +96,8 @@ class awindow(arcade.Window):
     def draw_selected(self):
         if self.selected != 0:
             if True == self.first_sel:
-                arcade.play_sound(sclick)
+                #arcade.play_sound(sclick)
+                sclick.play()
                 self.first_sel = False
         
             (w, h) = self.selected
@@ -176,7 +177,7 @@ class awindow(arcade.Window):
             do_clean = 1
     
     def draw_top(self):
-        (sc_x, sc_y) = (table_width - 130, table_height + 10)
+        (sc_x, sc_y) = (table_width - 150, table_height + 10)
         
         arcade.draw_rectangle_filled(table_width//2, table_height + top_block_h//2, table_width, top_block_h, arcade.color.AERO_BLUE)
         
@@ -334,7 +335,8 @@ def stone_alpha_zero():
                     break
                         
                 if not add_done:
-                    arcade.play_sound(sclean)
+                    #arcade.play_sound(sclean)
+                    sclean.play()
                     score += add_score(len(s))
                     calc_del_score.remove(s)
                     dtime = 0.5
@@ -411,7 +413,8 @@ def check_hard_del():
         #if True:
         if del_num < 9:
             # delete all
-            arcade.play_sound(sall_clean)
+            #arcade.play_sound(sall_clean)
+            sall_clean.play()
             
             for w in range(w_num):
                 for h in range(h_num):
