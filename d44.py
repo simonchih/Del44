@@ -5,11 +5,11 @@ import time
 import copy
 from _thread import *
 
-stone = arcade.load_texture("images/stone_20x20.gif")
-stone_green = arcade.load_texture("images/stone_green_20x20.gif")
-stone_yellow = arcade.load_texture("images/stone_yellow_20x20.gif")
-stone_red = arcade.load_texture("images/stone_red_20x20.gif")
-stone_blue = arcade.load_texture("images/stone_blue_20x20.gif")
+stone = arcade.load_texture("images/stone_20x20.png")
+stone_green = arcade.load_texture("images/stone_green_20x20.png")
+stone_yellow = arcade.load_texture("images/stone_yellow_20x20.png")
+stone_red = arcade.load_texture("images/stone_red_20x20.png")
+stone_blue = arcade.load_texture("images/stone_blue_20x20.png")
 
 # Get play more than once defect while streaming=True
 sclick = arcade.Sound("sounds/Sound_CLICK.WAV")
@@ -64,6 +64,17 @@ class awindow(arcade.Window):
         # (red, green, blue, alpha) format.
         arcade.set_background_color(arcade.color.ALLOY_ORANGE)
     
+    
+
+        # --- Fast text rendering (avoid arcade.draw_text each frame) ---
+        self._last_score = None
+        self.score_text = arcade.Text(
+            text="",
+            x=table_width - 170,
+            y=table_height + 10,
+            color=arcade.color.BLACK,
+            font_size=12,
+        )
     def setup(self):
         global stone_matrix
         
@@ -107,7 +118,7 @@ class awindow(arcade.Window):
             bottom = h * cell_height
             top = bottom + cell_height
             
-            arcade.draw_lrtb_rectangle_outline(left = left, right = right, top = top, bottom = bottom, color = arcade.color.ALABAMA_CRIMSON, border_width = 2)        
+            arcade.draw_lrbt_rectangle_outline(left=left, right=right, bottom=bottom, top=top, color=arcade.color.ALABAMA_CRIMSON, border_width=2)       
     
     def draw_stone(self, stone_matrix):
         global stone_center_cor
@@ -117,7 +128,7 @@ class awindow(arcade.Window):
                 istone = index_to_texture(stone_matrix[x][y])
                 if istone != None:
                     (w_cor, h_cor) = stone_center_cor[x][y]
-                    arcade.draw_texture_rectangle(w_cor, h_cor, cell_width, cell_height, istone, 0, stone_alpha[x][y])
+                    draw_tex(w_cor, h_cor, cell_width, cell_height, istone, 0, stone_alpha[x][y]  * 255)
                   
     def clean(self):
         global stone_matrix
@@ -178,15 +189,24 @@ class awindow(arcade.Window):
             do_clean = 1
     
     def draw_top(self):
-        (sc_x, sc_y) = (table_width - 170, table_height + 10)
-        
-        arcade.draw_rectangle_filled(table_width//2, table_height + top_block_h//2, table_width, top_block_h, arcade.color.AERO_BLUE)
+        draw_rect_center_filled(
+            table_width // 2,
+            table_height + top_block_h // 2,
+            table_width,
+            top_block_h,
+            arcade.color.AERO_BLUE,
+        )
 
-        arcade.draw_text("SCORE   %10d" % (score % 10000000000), sc_x, sc_y, arcade.color.BLACK, 12)
-        
+        # Update text only when score changes (much faster than draw_text every frame)
+        if score != self._last_score:
+            self.score_text.text = f"SCORE   {(score % 10000000000):10d}"
+            self._last_score = score
+
+        self.score_text.draw()
+
     # override
     def on_draw(self):    
-        arcade.start_render()
+        self.clear()          # 或 arcade.get_window().clear()
         self.draw_table()
         self.draw_stone(stone_matrix)
         self.draw_selected()
@@ -214,7 +234,11 @@ class awindow(arcade.Window):
             else:
                 stone_mark = set()
                 (dest_w, dest_h) = (x // 30, y // 30)
+                dest_w = int(round(dest_w))
+                dest_h = int(round(dest_h))
                 (org_w, org_h) = self.selected
+                org_w = int(round(org_w))
+                org_h = int(round(org_h))
                 
                 if dest_h == org_h:
                     if dest_w == org_w + 1:
@@ -422,6 +446,26 @@ def check_hard_del():
                     stone_alpha[w][h] = alpha_begin_minus
             
             time.sleep(5)
+
+def draw_rect_center_filled(cx, cy, w, h, color, angle=0):
+    # Arcade 3.x：用 Rect + draw_rect_filled
+    if hasattr(arcade, "draw_rect_filled") and hasattr(arcade, "XYWH"):
+        arcade.draw_rect_filled(arcade.XYWH(cx, cy, w, h), color, tilt_angle=angle)
+    # 舊版 Arcade（如果你哪天換回去）
+    else:
+        arcade.draw_rectangle_filled(cx, cy, w, h, color, angle)
+
+def draw_tex(w, h, cw, ch, tex, angle=0, alpha=255):
+    # 確保 alpha 是 0~255 的 int
+    alpha = int(alpha)
+
+    # Arcade 3.x: draw_texture_rect(texture, rect, *, angle=..., alpha=...)
+    if hasattr(arcade, "draw_texture_rect"):
+        rect = arcade.XYWH(w, h, cw, ch)   # 通常 w,h 直接用「中心座標」
+        arcade.draw_texture_rect(tex, rect, angle=angle, alpha=alpha)
+    else:
+        # 舊版 Arcade
+        arcade.draw_texture_rectangle(w, h, cw, ch, tex, angle, alpha)
     
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
