@@ -62,7 +62,7 @@ class awindow(arcade.Window):
         # http://arcade.academy/arcade.color.html
         # Colors can also be specified in (red, green, blue) format and
         # (red, green, blue, alpha) format.
-        arcade.set_background_color(arcade.color.ALLOY_ORANGE)
+        arcade.set_background_color(arcade.color.AERO_BLUE)
     
     
 
