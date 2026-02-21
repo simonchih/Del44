@@ -1,1 +1,1 @@
-PyInstaller --noconsole --add-data ./images/*;./images/ --add-data ./sounds/*;./sounds/ --add-data ./x86_dll/*;. d44.py
+PyInstaller -F --noconsole --add-data ./images/*;./images/ --add-data ./sounds/*;./sounds/ d44.py
