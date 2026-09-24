@@ -43,6 +43,30 @@ Run the real-window smoke test on a desktop with a display:
 python tests/smoke.py
 ```
 
+==Build a Windows executable==
+
+Use the project virtual environment (Python 3.10+, verified with 3.13).
+Do not invoke a global `PyInstaller` executable, which may belong to an
+older Python with incompatible Arcade/pyglet packages.
+
+```powershell
+# Only if .venv does not exist yet:
+py -3.13 -m venv .venv
+
+# Installs the pinned build dependencies and builds dist/d44.exe:
+.\build.cmd
+```
+
+`build.cmd` works from PowerShell and Command Prompt without changing
+PowerShell's execution policy. `build.ps1` remains available for systems
+where PowerShell scripts are enabled.
+
+The spec includes images, sounds, and Arcade's package resources. The new
+build uses `build/verified` so it does not reuse older global build files.
+The executable includes Python; players do not need a Python installation.
+Run `.\tests\smoke_exe.ps1` to verify the packaged executable starts from
+outside the project directory, responds, and closes cleanly.
+
 ==Main menu and tutorial==
 
 The game uses Arcade 3.x. Launch `python d44.py` to open the new title screen.
