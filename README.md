@@ -43,6 +43,26 @@ Run the real-window smoke test on a desktop with a display:
 python tests/smoke.py
 ```
 
+==Main menu and tutorial==
+
+The game uses Arcade 3.x. Launch `python d44.py` to open the new title screen.
+Click **Start Game** (upper button) to play, or **Tutorial** (lower button)
+for nine self-paced lessons in English. The game board and its background
+workers start only when you choose Start Game.
+
+The tutorial covers source selection, adjacent targets, copying runs of at
+least three, clearing lines of at least five, falling/refilling, scoring,
+invalid moves, and automatic unscored full clears. Lessons 2 and 3 include
+clickable practice using the real stone artwork. Practice does not change
+the game board or score. Use **Back** / **Next** or Left / Right to browse,
+and **Menu** or Esc to return to the title screen. The final lesson also
+offers **Start Game**. On the menu, Up / Down selects a button and Enter
+activates it; Tab and Space are also supported.
+
+The reference-inspired title artwork is `images/menu-background.png`;
+the menu and tutorial implementation is `menu.py`. All player-facing text
+is in English. The existing packaging spec includes the new background.
+
 The five sprites in `images/` were regenerated in a glossy candy-gem style.
 Their historical `_20x20` names are retained for compatibility; the PNGs now
 contain high-resolution RGBA artwork and are rendered in fixed 30-pixel cells.

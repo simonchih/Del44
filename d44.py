@@ -3,6 +3,7 @@ import random
 import time
 import copy
 import math
+from menu import FrontEnd
 from pathlib import Path
 from _thread import *
 
@@ -75,6 +76,28 @@ class awindow(arcade.Window):
         )
         self.title_text = arcade.Text("DELETION 44", 14, table_height + 10,
                                       (100, 223, 255), 15, bold=True)
+        self.front_end = FrontEnd(self)
+        self.playing = False
+        self.workers_started = False
+
+    def start_game(self, start_workers=True):
+        if self.playing:
+            return
+        self.setup()
+        self.playing = True
+        if start_workers and not self.workers_started:
+            self.workers_started = True
+            start_new_thread(stone_alpha_zero, ())
+            start_new_thread(down, ())
+            start_new_thread(check_hard_del, ())
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        if not self.playing:
+            self.front_end.mouse = (x, y)
+
+    def on_key_press(self, symbol, modifiers):
+        if not self.playing:
+            self.front_end.key(symbol)
 
     def setup(self):
         global stone_matrix
@@ -215,6 +238,9 @@ class awindow(arcade.Window):
     # override
     def on_draw(self):    
         self.clear()          # 或 arcade.get_window().clear()
+        if not self.playing:
+            self.front_end.draw()
+            return
         self.draw_table()
         self.draw_stone(stone_matrix)
         self.draw_selected()
@@ -230,6 +256,9 @@ class awindow(arcade.Window):
         #arcade.finish_render()
         
     def on_update(self, delta_time):
+        if not self.playing:
+            self.front_end.time += delta_time
+            return
         self.effect_time += delta_time
         fading = {(x, y) for x in range(w_num) for y in range(h_num)
                   if 0 < stone_alpha[x][y] < 255}
@@ -265,6 +294,10 @@ class awindow(arcade.Window):
     # override
     def on_mouse_press(self, x, y, button, modifiers):
         global stone_matrix
+        if not self.playing:
+            if button == arcade.MOUSE_BUTTON_LEFT:
+                self.front_end.click(x, y)
+            return
         
         if 0 == do_clean and 0 == down_occur and self.on_click(button):
         #if self.on_click(button):
@@ -511,10 +544,6 @@ def draw_tex(w, h, cw, ch, tex, angle=0, alpha=255):
     
 def main():
     window = awindow(table_width, table_height + top_block_h, "Deletion 44")
-    window.setup()
-    start_new_thread(stone_alpha_zero, ())
-    start_new_thread(down, ())
-    start_new_thread(check_hard_del, ())
     
     # Keep the window up until someone closes it.
     arcade.run()
