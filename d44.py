@@ -1,29 +1,35 @@
 import arcade
-import os
 import random
 import time
 import copy
+import math
+from pathlib import Path
 from _thread import *
 
-stone = arcade.load_texture("images/stone_20x20.png")
-stone_green = arcade.load_texture("images/stone_green_20x20.png")
-stone_yellow = arcade.load_texture("images/stone_yellow_20x20.png")
-stone_red = arcade.load_texture("images/stone_red_20x20.png")
-stone_blue = arcade.load_texture("images/stone_blue_20x20.png")
+ASSET_ROOT = Path(__file__).resolve().parent
+
+def asset_path(name):
+    return str(ASSET_ROOT / name)
+
+stone = arcade.load_texture(asset_path("images/stone_20x20.png"))
+stone_green = arcade.load_texture(asset_path("images/stone_green_20x20.png"))
+stone_yellow = arcade.load_texture(asset_path("images/stone_yellow_20x20.png"))
+stone_red = arcade.load_texture(asset_path("images/stone_red_20x20.png"))
+stone_blue = arcade.load_texture(asset_path("images/stone_blue_20x20.png"))
 
 # Get play more than once defect while streaming=True
-sclick = arcade.Sound("sounds/Sound_CLICK.WAV")
-sclean = arcade.Sound("sounds/message_send_009.wav")
-sall_clean = arcade.Sound("sounds/alert_gen_echo_011.wav")
+sclick = arcade.Sound(asset_path("sounds/Sound_CLICK.WAV"))
+sclean = arcade.Sound(asset_path("sounds/message_send_009.wav"))
+sall_clean = arcade.Sound(asset_path("sounds/alert_gen_echo_011.wav"))
 
 h_num = 20
 w_num = 20
 
-s = 1.5 #scale
 top_block_h = 40
 
-cell_width = int(s*stone.width)
-cell_height = int(s*stone.height)
+# Keep board geometry independent of the high-resolution sprite assets.
+cell_width = 30
+cell_height = 30
 table_width = w_num * cell_width
 table_height = h_num * cell_height
 
@@ -47,22 +53,14 @@ class awindow(arcade.Window):
         # Call the parent class initializer
         super().__init__(width, height, title)
         
-        # Set the working directory (where we expect to find files) to the same
-        # directory this .py file is in. You can leave this out of your own
-        # code, but it is needed to easily run the examples using "python -m"
-        # as mentioned at the top of this program.
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        os.chdir(file_path)
-        
         self.first_sel = True
         self.selected = 0 # (w, h): selected, 0: NOT
         
-        # Set the background color to white
-        # For a list of named colors see
-        # http://arcade.academy/arcade.color.html
-        # Colors can also be specified in (red, green, blue) format and
-        # (red, green, blue, alpha) format.
-        arcade.set_background_color(arcade.color.AERO_BLUE)
+        arcade.set_background_color((12, 17, 35))
+        self.effect_time = 0.0
+        self.particles = []
+        self._fading_cells = set()
+        self._effect_random = random.Random()
     
     
 
@@ -72,9 +70,12 @@ class awindow(arcade.Window):
             text="",
             x=table_width - 170,
             y=table_height + 10,
-            color=arcade.color.BLACK,
+            color=(255, 223, 110),
             font_size=12,
         )
+        self.title_text = arcade.Text("DELETION 44", 14, table_height + 10,
+                                      (100, 223, 255), 15, bold=True)
+
     def setup(self):
         global stone_matrix
         
@@ -99,11 +100,11 @@ class awindow(arcade.Window):
     def draw_table(self):
         # Draw vertical lines
         for x in range(0, table_width + 1, cell_width):
-            arcade.draw_line(x, 0, x, table_height, arcade.color.BLACK, 1)
+            arcade.draw_line(x, 0, x, table_height, (30, 43, 64), 1)
         
         # Draw horizontal lines
         for y in range(0, table_height + 1, cell_height):
-            arcade.draw_line(0, y, table_width, y, arcade.color.BLACK, 1)
+            arcade.draw_line(0, y, table_width, y, (30, 43, 64), 1)
         
     def draw_selected(self):
         if self.selected != 0:
@@ -118,7 +119,12 @@ class awindow(arcade.Window):
             bottom = h * cell_height
             top = bottom + cell_height
             
-            arcade.draw_lrbt_rectangle_outline(left=left, right=right, bottom=bottom, top=top, color=arcade.color.ALABAMA_CRIMSON, border_width=2)       
+            pulse = 0.5 + 0.5 * math.sin(self.effect_time * 6)
+            cx, cy = (left + right) / 2, (bottom + top) / 2
+            arcade.draw_circle_outline(cx, cy, 13 + pulse * 2,
+                                       (255, 218, 80, int(120 + pulse * 100)), 3)
+            arcade.draw_lrbt_rectangle_outline(left=left + 1, right=right - 1,
+                bottom=bottom + 1, top=top - 1, color=(255, 245, 185), border_width=1)
     
     def draw_stone(self, stone_matrix):
         global stone_center_cor
@@ -128,7 +134,7 @@ class awindow(arcade.Window):
                 istone = index_to_texture(stone_matrix[x][y])
                 if istone != None:
                     (w_cor, h_cor) = stone_center_cor[x][y]
-                    draw_tex(w_cor, h_cor, cell_width, cell_height, istone, 0, stone_alpha[x][y]  * 255)
+                    draw_tex(w_cor, h_cor, cell_width, cell_height, istone, 0, stone_alpha[x][y])
                   
     def clean(self):
         global stone_matrix
@@ -194,7 +200,7 @@ class awindow(arcade.Window):
             table_height + top_block_h // 2,
             table_width,
             top_block_h,
-            arcade.color.AERO_BLUE,
+            (19, 28, 49),
         )
 
         # Update text only when score changes (much faster than draw_text every frame)
@@ -202,7 +208,9 @@ class awindow(arcade.Window):
             self.score_text.text = f"SCORE   {(score % 10000000000):10d}"
             self._last_score = score
 
+        self.title_text.draw()
         self.score_text.draw()
+        arcade.draw_line(0, table_height, table_width, table_height, (58, 164, 207), 2)
 
     # override
     def on_draw(self):    
@@ -210,6 +218,7 @@ class awindow(arcade.Window):
         self.draw_table()
         self.draw_stone(stone_matrix)
         self.draw_selected()
+        self.draw_effects()
         
         if 0 == down_occur:
             self.clean()
@@ -220,20 +229,53 @@ class awindow(arcade.Window):
         # Must happen after all draw commands
         #arcade.finish_render()
         
+    def on_update(self, delta_time):
+        self.effect_time += delta_time
+        fading = {(x, y) for x in range(w_num) for y in range(h_num)
+                  if 0 < stone_alpha[x][y] < 255}
+        palette = [(112, 255, 56), (255, 212, 45), (255, 67, 88),
+                   (44, 207, 255), (255, 73, 207)]
+        for x, y in sorted(fading - self._fading_cells):
+            color = palette[max(1, stone_matrix[x][y]) - 1]
+            cx, cy = stone_center_cor[x][y]
+            for _ in range(5):
+                angle = self._effect_random.uniform(0, math.tau)
+                speed = self._effect_random.uniform(18, 60)
+                self.particles.append([cx, cy, math.cos(angle) * speed,
+                    math.sin(angle) * speed, 0.65, color])
+        self._fading_cells = fading
+        # Cap bursts during a full-board clear.
+        self.particles = self.particles[-600:]
+        for p in self.particles:
+            p[0] += p[2] * delta_time
+            p[1] += p[3] * delta_time
+            p[3] -= 65 * delta_time
+            p[4] -= delta_time
+        self.particles = [p for p in self.particles if p[4] > 0]
+
+    def draw_effects(self):
+        for x, y, vx, vy, life, color in self.particles:
+            if not (0 <= x < table_width and 0 <= y < table_height):
+                continue
+            alpha = int(255 * life / 0.65)
+            arcade.draw_circle_filled(x, y, 3, (*color, alpha // 4))
+            arcade.draw_line(x - 2, y, x + 2, y, (*color, alpha), 1)
+            arcade.draw_line(x, y - 2, x, y + 2, (255, 255, 225, alpha), 1)
+
     # override
     def on_mouse_press(self, x, y, button, modifiers):
         global stone_matrix
         
-        if 0 == do_clean and self.on_click(button):
+        if 0 == do_clean and 0 == down_occur and self.on_click(button):
         #if self.on_click(button):
-            if x >= table_width or y >= table_height:
+            if x < 0 or y < 0 or x >= table_width or y >= table_height:
                 self.selected = 0
                 self.first_sel = True
             elif 0 == self.selected:
-                self.selected = (x // 30, y // 30)
+                self.selected = (int(x // cell_width), int(y // cell_height))
             else:
                 stone_mark = set()
-                (dest_w, dest_h) = (x // 30, y // 30)
+                (dest_w, dest_h) = (int(x // cell_width), int(y // cell_height))
                 dest_w = int(round(dest_w))
                 dest_h = int(round(dest_h))
                 (org_w, org_h) = self.selected
@@ -457,7 +499,7 @@ def draw_rect_center_filled(cx, cy, w, h, color, angle=0):
 
 def draw_tex(w, h, cw, ch, tex, angle=0, alpha=255):
     # 確保 alpha 是 0~255 的 int
-    alpha = int(alpha)
+    alpha = max(0, min(255, int(alpha)))
 
     # Arcade 3.x: draw_texture_rect(texture, rect, *, angle=..., alpha=...)
     if hasattr(arcade, "draw_texture_rect"):

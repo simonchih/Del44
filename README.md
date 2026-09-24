@@ -27,3 +27,24 @@ The name of game is "Deletion 44" as it can delete 44 same color neighbor stones
 
 全部消除?
 如果同色的石頭太少，造成難以消除，會啟動全部消除，但此時只消除，不記分。
+
+==Run (Python 3.10+)==
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python d44.py
+```
+
+Run the real-window smoke test on a desktop with a display:
+
+```sh
+python tests/smoke.py
+```
+
+The five sprites in `images/` were regenerated in a glossy candy-gem style.
+Their historical `_20x20` names are retained for compatibility; the PNGs now
+contain high-resolution RGBA artwork and are rendered in fixed 30-pixel cells.
+Selection has a pulsing gold ring; clearing produces fading colored sparkles.
+Generation prompts are recorded in `docs/image-prompts.md`.
