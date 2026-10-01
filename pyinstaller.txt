@@ -1,3 +1,7 @@
+macOS/Linux (from this project directory):
+  ./build.sh
+Output: dist/d44 (single executable, including Python and game resources)
+
 Windows PowerShell or Command Prompt (from this project directory):
   .\build.cmd
 

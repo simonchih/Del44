@@ -43,6 +43,22 @@ Run the real-window smoke test on a desktop with a display:
 python tests/smoke.py
 ```
 
+==Build a macOS/Linux executable==
+
+```sh
+./build.sh
+```
+
+The script creates `.venv` if needed, installs the pinned build dependencies,
+checks imports, and uses that same environment to build `dist/d44`.
+To choose a Python when creating the environment, use `PYTHON=python3.13 ./build.sh`.
+Build on the target operating system and CPU architecture.
+
+`dist/d44` is a single executable containing Python, Arcade, native dependencies,
+images, sounds, fonts, and shaders. Copy just this file to run it on a compatible
+Mac without installing Python or keeping the source/resource directories.
+PyInstaller extracts the bundled resources to a temporary directory at startup.
+
 ==Build a Windows executable==
 
 Use the project virtual environment (Python 3.10+, verified with 3.13).

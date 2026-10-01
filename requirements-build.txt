@@ -1,4 +1,4 @@
-# Known-good Windows build environment. Install into .venv only.
+# Shared macOS/Windows build environment. Install into .venv only.
 arcade==3.3.3
 pyglet==2.1.16
 pyinstaller==6.22.3
